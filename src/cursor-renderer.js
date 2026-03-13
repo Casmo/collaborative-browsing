@@ -67,6 +67,7 @@ class CursorRenderer {
     // Convert percentage-based coordinates to pixels based on current viewport
     const pixelX = data.mouseX * window.innerWidth;
     const pixelY = data.mouseY * window.innerHeight;
+    console.log('[CursorRenderer] Received:', data, 'Converted to pixels:', pixelX, pixelY, 'Viewport:', window.innerWidth, window.innerHeight);
 
     if (!cursorData) {
       // Create new cursor

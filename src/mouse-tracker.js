@@ -78,12 +78,14 @@ class MouseTracker {
   }
 
   sendUpdate() {
-    this.emit('update', {
+    const data = {
       path: this.path,
       mouseX: this.mouseX,
       mouseY: this.mouseY,
       timestamp: Date.now()
-    });
+    };
+    console.log('[MouseTracker] Sending:', data);
+    this.emit('update', data);
   }
 }
 
