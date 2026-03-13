@@ -18,23 +18,15 @@ class PeerManager {
   }
 
   getPeerConfig() {
-    // Use PeerJS cloud server with reliable STUN/TURN infrastructure
+    // Simplified configuration with minimal STUN servers for better reliability
     return {
-      host: '0.peerjs.com',
-      port: 443,
-      path: '/',
-      secure: true,
-      debug: 0, // Set to 3 for verbose debugging
+      debug: 2, // Enable debugging to see connection issues
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-          {
-            urls: 'turn:0.peerjs.com:3478',
-            username: 'peerjs',
-            credential: 'peerjsp'
-          }
-        ]
+          { urls: 'stun:global.stun.twilio.com:3478' }
+        ],
+        sdpSemantics: 'unified-plan'
       }
     };
   }
