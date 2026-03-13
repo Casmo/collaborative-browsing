@@ -5,6 +5,7 @@
   "main": "dist/collaborative-browsing.js",
   "scripts": {
     "build": "rollup -c",
+    "production": "rollup -c",
     "dev": "rollup -c -w"
   },
   "keywords": ["peerjs", "collaborative", "cursor", "browsing", "easter-egg"],
