@@ -18,13 +18,22 @@ class PeerManager {
   }
 
   getPeerConfig() {
-    // Configure reliable ICE servers
+    // Use PeerJS cloud server with reliable STUN/TURN infrastructure
     return {
+      host: '0.peerjs.com',
+      port: 443,
+      path: '/',
+      secure: true,
+      debug: 0, // Set to 3 for verbose debugging
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' }
+          {
+            urls: 'turn:0.peerjs.com:3478',
+            username: 'peerjs',
+            credential: 'peerjsp'
+          }
         ]
       }
     };
