@@ -14,6 +14,20 @@ class PeerManager {
       data: [],
       disconnect: []
     };
+    this.peerConfig = this.getPeerConfig();
+  }
+
+  getPeerConfig() {
+    // Configure reliable ICE servers
+    return {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    };
   }
 
   getHostId() {
@@ -54,7 +68,7 @@ class PeerManager {
 
   start() {
     // Create peer with our client ID
-    this.peer = new Peer(this.myId);
+    this.peer = new Peer(this.myId, this.peerConfig);
 
     this.peer.on('open', () => {
       console.log('[CollaborativeBrowsing] My peer ID:', this.myId);
@@ -118,7 +132,7 @@ class PeerManager {
       this.peer.destroy();
     }
 
-    this.peer = new Peer(this.hostId);
+    this.peer = new Peer(this.hostId, this.peerConfig);
 
     this.peer.on('open', () => {
       console.log('[CollaborativeBrowsing] Successfully became host:', this.hostId);
