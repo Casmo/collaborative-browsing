@@ -1,0 +1,22 @@
+{
+  "name": "collaborative-browsing",
+  "version": "1.0.0",
+  "description": "A JavaScript library that shows other visitors browsing the same website",
+  "main": "dist/collaborative-browsing.js",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "keywords": ["peerjs", "collaborative", "cursor", "browsing", "easter-egg"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.9.6"
+  },
+  "dependencies": {
+    "peerjs": "^1.5.2"
+  }
+}

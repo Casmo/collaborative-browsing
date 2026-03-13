@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative Browsing Example</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+    }
+    .info {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    nav {
+      background: #4ECDC4;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    nav a {
+      color: white;
+      margin-right: 15px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Collaborative Browsing Demo</h1>
+
+  <div class="info">
+    <strong>Instructions:</strong>
+    <ol>
+      <li>Open this page in multiple browser windows or tabs</li>
+      <li>Move your mouse around - you'll see other cursors appear!</li>
+      <li>Navigate to different pages using the links below</li>
+      <li>Notice the badges showing how many visitors are on each page</li>
+    </ol>
+  </div>
+
+  <nav>
+    <a href="/page1.html">Page 1</a>
+    <a href="/page2.html">Page 2</a>
+    <a href="/page3.html">Page 3</a>
+  </nav>
+
+  <h2>About This Demo</h2>
+  <p>
+    This page uses the Collaborative Browsing library, which creates a
+    real-time shared browsing experience using PeerJS. Every visitor to
+    the site can see where other visitors are and what they're looking at.
+  </p>
+
+  <h3>Features</h3>
+  <ul>
+    <li>See mouse cursors of other visitors in real-time</li>
+    <li>Each visitor gets a unique color</li>
+    <li>Cursors fade out when visitors are on different pages</li>
+    <li>Link badges show how many visitors are on each page</li>
+    <li>Completely peer-to-peer using WebRTC</li>
+  </ul>
+
+  <h3>How to Add to Your Website</h3>
+  <p>Simply include this single script tag before your closing <code>&lt;/body&gt;</code> tag:</p>
+  <pre>&lt;script src="dist/collaborative-browsing.js"&gt;&lt;/script&gt;</pre>
+
+  <!-- Include the collaborative browsing script -->
+  <script src="dist/collaborative-browsing.js"></script>
+</body>
+</html>
