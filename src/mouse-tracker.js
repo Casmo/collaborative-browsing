@@ -27,8 +27,9 @@ class MouseTracker {
   init() {
     // Track mouse movement
     document.addEventListener('mousemove', (e) => {
-      this.mouseX = e.clientX + window.scrollX;
-      this.mouseY = e.clientY + window.scrollY;
+      // Use viewport-relative coordinates (percentage)
+      this.mouseX = e.clientX / window.innerWidth;
+      this.mouseY = e.clientY / window.innerHeight;
       this.throttledUpdate();
     });
 

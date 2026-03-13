@@ -16,7 +16,9 @@ class CursorRenderer {
     const style = document.createElement('style');
     style.textContent = `
       .collab-cursor {
-        position: absolute;
+        position: fixed;
+        top: 0;
+        left: 0;
         pointer-events: none;
         z-index: 999999;
         transition: opacity 0.3s ease;
@@ -62,6 +64,10 @@ class CursorRenderer {
   updateCursor(peerId, data) {
     let cursorData = this.cursors.get(peerId);
 
+    // Convert percentage-based coordinates to pixels based on current viewport
+    const pixelX = data.mouseX * window.innerWidth;
+    const pixelY = data.mouseY * window.innerHeight;
+
     if (!cursorData) {
       // Create new cursor
       const color = this.getNextColor();
@@ -69,18 +75,18 @@ class CursorRenderer {
       cursorData = {
         element,
         color,
-        currentX: data.mouseX,
-        currentY: data.mouseY,
-        targetX: data.mouseX,
-        targetY: data.mouseY,
+        currentX: pixelX,
+        currentY: pixelY,
+        targetX: pixelX,
+        targetY: pixelY,
         currentPath: data.path
       };
       this.cursors.set(peerId, cursorData);
     }
 
     // Update target position
-    cursorData.targetX = data.mouseX;
-    cursorData.targetY = data.mouseY;
+    cursorData.targetX = pixelX;
+    cursorData.targetY = pixelY;
 
     // Handle path changes
     if (data.path !== this.currentPath) {
