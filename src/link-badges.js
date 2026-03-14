@@ -1,3 +1,8 @@
+// Normalize pathnames so trailing slashes don't cause mismatches (/archive/ === /archive)
+function normalizePath(p) {
+  return p.replace(/\/$/, '') || '/';
+}
+
 class LinkBadges {
   constructor() {
     this.badges = new Map(); // link element -> badge element
@@ -24,61 +29,65 @@ class LinkBadges {
       }
 
       @keyframes collab-badge-pop {
-        0% {
-          transform: scale(0);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
+        0%   { transform: scale(0); }
+        50%  { transform: scale(1.1); }
+        100% { transform: scale(1); }
       }
     `;
     document.head.appendChild(style);
   }
 
   update(pathCounts) {
-    // Remove old badges
-    this.clearBadges();
+    // Normalize the incoming path keys once
+    const normalizedCounts = new Map();
+    pathCounts.forEach((count, path) => {
+      normalizedCounts.set(normalizePath(path), count);
+    });
 
-    // Find all links on the page
     const links = document.querySelectorAll('a[href]');
+    const active = new Set();
 
     links.forEach((link) => {
       try {
         const url = new URL(link.href, window.location.origin);
+        if (url.hostname !== window.location.hostname) return;
 
-        // Only process internal links
-        if (url.hostname === window.location.hostname) {
-          const path = url.pathname;
-          const count = pathCounts.get(path);
+        const path = normalizePath(url.pathname);
+        const count = normalizedCounts.get(path);
 
-          if (count && count > 0) {
-            this.addBadge(link, count);
-          }
+        if (count && count > 0) {
+          this.addOrUpdateBadge(link, count);
+          active.add(link);
         }
       } catch (e) {
         // Invalid URL, skip
       }
     });
+
+    // Remove badges for links that no longer have visitors
+    // (only remove stale ones — don't clear everything, which would retrigger the animation)
+    this.badges.forEach((badge, link) => {
+      if (!active.has(link)) {
+        badge.remove();
+        this.badges.delete(link);
+      }
+    });
   }
 
-  addBadge(link, count) {
-    // Check if badge already exists
+  addOrUpdateBadge(link, count) {
     if (this.badges.has(link)) {
+      // Update in-place — no DOM removal so the animation doesn't replay
       const badge = this.badges.get(link);
       badge.textContent = count;
+      badge.title = `${count} visitor${count > 1 ? 's' : ''} on this page`;
       return;
     }
 
-    // Create new badge
     const badge = document.createElement('span');
     badge.className = 'collab-link-badge';
     badge.textContent = count;
     badge.title = `${count} visitor${count > 1 ? 's' : ''} on this page`;
 
-    // Insert badge after link
     if (link.nextSibling) {
       link.parentNode.insertBefore(badge, link.nextSibling);
     } else {
@@ -86,13 +95,6 @@ class LinkBadges {
     }
 
     this.badges.set(link, badge);
-  }
-
-  clearBadges() {
-    this.badges.forEach((badge) => {
-      badge.remove();
-    });
-    this.badges.clear();
   }
 }
 
