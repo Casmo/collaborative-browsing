@@ -95,6 +95,7 @@ CollaborativeBrowsing.start({
   sounds: false,           // Audio feedback (off by default)
 
   // Identity
+  hostId: 'my-app-room',   // Override the PeerJS host ID (defaults to sanitized domain name)
   userLabel: 'Alice',      // Your display name (random name if omitted)
 
   // Styling

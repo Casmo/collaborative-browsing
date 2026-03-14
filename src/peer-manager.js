@@ -1,11 +1,11 @@
 import Peer from 'peerjs';
 
 class PeerManager {
-  constructor() {
+  constructor(options = {}) {
     this.peer = null;
     this.connections = new Map(); // peerId -> connection
     this.isHost = false;
-    this.hostId = this.getHostId();
+    this.hostId = options.hostId ? this.sanitizeId(options.hostId) : this.getHostId();
     this.myId = this.generateClientId();
     this.hostConnectionId = null; // Track which connection is to the host
     this.reconnectAttempts = 0;
@@ -16,20 +16,16 @@ class PeerManager {
     };
   }
 
-  getHostId() {
-    // Use domain as host ID (sanitize for PeerJS)
-    // PeerJS IDs must start with a letter or underscore
-    let hostname = window.location.hostname || 'localhost';
-
-    // Replace dots with dashes and remove other invalid characters
-    let sanitized = hostname.replace(/\./g, '-').replace(/[^a-zA-Z0-9_-]/g, '');
-
-    // Ensure it starts with a letter
+  sanitizeId(id) {
+    let sanitized = String(id).replace(/\./g, '-').replace(/[^a-zA-Z0-9_-]/g, '');
     if (!sanitized || !/^[a-zA-Z]/.test(sanitized)) {
       sanitized = 'host-' + sanitized;
     }
-
     return sanitized;
+  }
+
+  getHostId() {
+    return this.sanitizeId(window.location.hostname || 'localhost');
   }
 
   generateClientId() {

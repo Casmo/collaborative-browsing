@@ -18,6 +18,7 @@ const DEFAULTS = {
   scrollIndicators: true,
   textHighlight: true,
   sounds: false,
+  hostId: null,      // override the PeerJS host ID (defaults to sanitized domain name)
   userLabel: null,   // auto-generated random name if null
   colors: null,      // array of hex colors for cursors; uses built-in palette if null
   cursorSize: 20,
@@ -81,7 +82,7 @@ class CollaborativeBrowsing {
       this.soundEffects = new SoundEffects();
     }
 
-    this.peerManager = new PeerManager();
+    this.peerManager = new PeerManager({ hostId: this.options.hostId });
     this.peerManager.on('data', (connPeerId, data) => this._handleData(connPeerId, data));
     this.peerManager.on('disconnect', (connPeerId) => this._handleDisconnect(connPeerId));
 
