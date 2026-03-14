@@ -62,12 +62,10 @@ class PeerManager {
     this.peer = new Peer(this.myId, this.peerConfig);
 
     this.peer.on('open', () => {
-      console.log('[CollaborativeBrowsing] My peer ID:', this.myId);
       this.tryConnectToHost();
     });
 
     this.peer.on('error', (err) => {
-      console.log('[CollaborativeBrowsing] Peer error:', err);
       // If we can't connect to host, try to become the host
       if (err.type === 'peer-unavailable' || err.type === 'network') {
         this.becomeHost();
@@ -87,25 +85,21 @@ class PeerManager {
       return;
     }
 
-    console.log('[CollaborativeBrowsing] Trying to connect to host:', this.hostId);
     const conn = this.peer.connect(this.hostId, { reliable: true });
 
     conn.on('open', () => {
-      console.log('[CollaborativeBrowsing] Connected to host');
       this.hostConnectionId = this.hostId;
       this.reconnectAttempts = 0; // Reset on successful connection
       this.addConnection(this.hostId, conn);
     });
 
     conn.on('error', (err) => {
-      console.log('[CollaborativeBrowsing] Connection error:', err);
       this.becomeHost();
     });
 
     // If connection doesn't open in 5 seconds, become host
     setTimeout(() => {
       if (!conn.open) {
-        console.log('[CollaborativeBrowsing] Connection timeout, becoming host');
         this.becomeHost();
       }
     }, 5000);
@@ -114,7 +108,6 @@ class PeerManager {
   becomeHost() {
     if (this.isHost) return;
 
-    console.log('[CollaborativeBrowsing] Attempting to become host');
     this.isHost = true;
     this.hostConnectionId = null; // We're the host now, no host connection
 
@@ -126,7 +119,6 @@ class PeerManager {
     this.peer = new Peer(this.hostId, this.peerConfig);
 
     this.peer.on('open', () => {
-      console.log('[CollaborativeBrowsing] Successfully became host:', this.hostId);
       this.reconnectAttempts = 0;
     });
 
@@ -135,11 +127,9 @@ class PeerManager {
     });
 
     this.peer.on('error', (err) => {
-      console.log('[CollaborativeBrowsing] Host peer error:', err);
 
       // If someone else already claimed the host ID, we failed to become host
       if (err.type === 'unavailable-id') {
-        console.log('[CollaborativeBrowsing] Host ID taken, reconnecting as client');
         this.isHost = false;
         this.reconnectAsClient();
       }
@@ -155,14 +145,12 @@ class PeerManager {
     const delay = Math.random() * 500;
 
     setTimeout(() => {
-      console.log('[CollaborativeBrowsing] Attempting host migration');
       this.becomeHost();
     }, delay);
   }
 
   reconnectAsClient() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[CollaborativeBrowsing] Max reconnect attempts reached');
       return;
     }
 
@@ -170,7 +158,6 @@ class PeerManager {
 
     // Wait a bit before reconnecting to give the new host time to stabilize
     setTimeout(() => {
-      console.log('[CollaborativeBrowsing] Reconnecting to new host (attempt', this.reconnectAttempts, ')');
 
       // Recreate peer with client ID
       if (this.peer) {
@@ -183,7 +170,6 @@ class PeerManager {
   }
 
   handleIncomingConnection(conn) {
-    console.log('[CollaborativeBrowsing] Incoming connection from:', conn.peer);
 
     conn.on('open', () => {
       this.addConnection(conn.peer, conn);
@@ -207,25 +193,21 @@ class PeerManager {
     });
 
     conn.on('close', () => {
-      console.log('[CollaborativeBrowsing] Connection closed:', peerId);
       this.connections.delete(peerId);
       this.emit('disconnect', peerId);
 
       // If this was the host connection, trigger host migration
       if (!this.isHost && peerId === this.hostConnectionId) {
-        console.log('[CollaborativeBrowsing] Host disconnected, initiating migration');
         this.handleHostDisconnect();
       }
     });
 
     conn.on('error', (err) => {
-      console.log('[CollaborativeBrowsing] Connection error:', peerId, err);
       this.connections.delete(peerId);
       this.emit('disconnect', peerId);
 
       // If this was the host connection, trigger host migration
       if (!this.isHost && peerId === this.hostConnectionId) {
-        console.log('[CollaborativeBrowsing] Host connection error, initiating migration');
         this.handleHostDisconnect();
       }
     });
