@@ -5,12 +5,18 @@ A lightweight JavaScript library that shows other visitors browsing your website
 ## Features
 
 - **Real-time mouse cursors**: See where other visitors are pointing on the page
+- **User labels**: Each cursor shows a randomly assigned (or custom) name
 - **Smooth animations**: Cursors move smoothly between positions
 - **Color-coded users**: Each visitor gets a unique color
 - **Page awareness**: Cursors fade out when users are on different pages
 - **Link badges**: See how many visitors are on each linked page
+- **Click animations**: Ripple effects appear when other users click
+- **Scroll indicators**: See where on the page other visitors are scrolled to
+- **Text highlighting**: See text other visitors have selected
+- **Chat**: A floating chat panel for visitors to communicate
+- **Sound effects**: Optional audio feedback for peer events
 - **Peer-to-peer**: Uses WebRTC via PeerJS for direct browser connections
-- **Zero configuration**: Just include the script and it works
+- **Fully configurable**: All features can be enabled/disabled individually
 - **Lightweight**: Single JavaScript file, no dependencies to manage
 
 ## Installation
@@ -42,7 +48,7 @@ The compiled file will be in `dist/collaborative-browsing.js`.
 
 ## Usage
 
-Simply include the script on any page where you want the collaborative browsing feature:
+Include the script and call `CollaborativeBrowsing.start()` with your desired options:
 
 ```html
 <!DOCTYPE html>
@@ -53,19 +59,68 @@ Simply include the script on any page where you want the collaborative browsing 
 <body>
   <h1>Welcome to my site!</h1>
 
-  <!-- Your content here -->
-
-  <!-- Add this script at the end of body -->
   <script src="dist/collaborative-browsing.js"></script>
+  <script>
+    CollaborativeBrowsing.start();
+  </script>
 </body>
 </html>
 ```
 
-That's it! The library will automatically:
+The library will automatically:
 1. Connect to other visitors on the same domain
-2. Share mouse positions and page locations
-3. Render cursors for other visitors
-4. Add badges to links showing visitor counts
+2. Share mouse positions, scroll depth, and page locations
+3. Render cursors with name labels for other visitors
+4. Show click ripples and text selection highlights
+5. Add badges to links showing visitor counts
+6. Provide a chat panel for real-time messaging
+
+## Configuration
+
+Pass an options object to `start()` to customize behavior:
+
+```js
+CollaborativeBrowsing.start({
+  // Master switch — set to true to completely disable the library
+  disabled: false,
+
+  // Feature toggles
+  cursors: true,           // Show remote mouse cursors
+  labels: true,            // Show name labels on cursors
+  linkBadges: true,        // Show visitor count badges on links
+  chat: true,              // Floating chat panel
+  clickAnimations: true,   // Ripple effect on remote clicks
+  scrollIndicators: true,  // Scroll position pips on the right edge
+  textHighlight: true,     // Highlight text selected by other visitors
+  sounds: false,           // Audio feedback (off by default)
+
+  // Identity
+  userLabel: 'Alice',      // Your display name (random name if omitted)
+
+  // Styling
+  colors: ['#FF6B6B', '#4ECDC4', '#45B7D1'],  // Custom cursor color palette
+  cursorSize: 20,                               // Cursor size in pixels
+  theme: {
+    badgeColor: '#FF6B6B'  // Background color of link badges
+  }
+});
+```
+
+### Disabling the script
+
+Set `disabled: true` to load the script without activating anything — useful for staging environments or feature flags:
+
+```js
+CollaborativeBrowsing.start({ disabled: true });
+```
+
+Or conditionally based on environment:
+
+```js
+CollaborativeBrowsing.start({
+  disabled: window.location.hostname === 'localhost'
+});
+```
 
 ## How It Works
 
@@ -73,8 +128,8 @@ That's it! The library will automatically:
 2. **Fallback Host**: If no host exists, the first visitor becomes the host
 3. **Peer Network**: All visitors connect to the host, which relays data between peers
 4. **Host Migration**: If the host leaves, remaining clients automatically elect a new host with minimal disruption
-5. **Data Sharing**: Each visitor broadcasts their mouse position and current page path
-6. **Visualization**: The library renders cursors and badges based on received data
+5. **Data Sharing**: Each visitor broadcasts their mouse position, scroll depth, current page path, and optional label
+6. **Visualization**: The library renders cursors, badges, scroll indicators, and highlights based on received data
 
 ### Host Migration Strategy
 
@@ -93,6 +148,7 @@ When the host disconnects, the library automatically handles failover:
 - **Domain-Based Rooms**: Visitors are automatically grouped by domain
 - **Throttled Updates**: Mouse positions are throttled to 50ms to reduce network traffic
 - **SPA Support**: Detects URL changes in single-page applications
+- **Web Audio API**: Sound effects are synthesized in-browser — no audio files needed
 
 ## Browser Support
 
@@ -106,13 +162,16 @@ Works in all modern browsers that support:
 This library shares:
 - Mouse cursor positions
 - Current page path (not query parameters)
+- Scroll depth (as a 0–1 fraction)
+- Text selections (document-relative bounding rects)
+- Chat messages
 - Peer connection data
 
 It does NOT share:
 - Personal information
 - Form data
 - Query parameters
-- User actions beyond mouse movement
+- User actions beyond mouse movement and explicit chat messages
 
 ## Development
 
@@ -131,15 +190,20 @@ npm run dev
 
 ```
 .
-├── dist/                  # Compiled output
+├── dist/                      # Compiled output
 ├── src/
-│   ├── index.js          # Main entry point
-│   ├── peer-manager.js   # PeerJS connection handling
-│   ├── mouse-tracker.js  # Mouse position and URL tracking
-│   ├── cursor-renderer.js # Cursor visualization
-│   └── link-badges.js    # Link badge system
-├── example.html          # Demo page
-├── rollup.config.js      # Build configuration
+│   ├── index.js               # Main entry point & orchestration
+│   ├── peer-manager.js        # PeerJS connection handling
+│   ├── mouse-tracker.js       # Mouse, scroll, click & selection tracking
+│   ├── cursor-renderer.js     # Cursor + label visualization
+│   ├── link-badges.js         # Link badge system
+│   ├── chat.js                # Floating chat panel
+│   ├── click-animator.js      # Click ripple animations
+│   ├── scroll-indicator.js    # Per-peer scroll position pips
+│   ├── text-highlighter.js    # Remote text selection highlights
+│   └── sound-effects.js       # Web Audio API sound feedback
+├── example.html               # Demo page
+├── rollup.config.js           # Build configuration
 └── package.json
 ```
 
@@ -150,13 +214,3 @@ MIT
 ## Contributing
 
 Contributions welcome! This is a fun easter egg feature that can be enhanced in many ways.
-
-## Ideas for Enhancement
-
-- Add user names or labels
-- Implement click animations
-- Add chat functionality
-- Show scrolling indicators
-- Highlight selected text
-- Add sound effects
-- Configuration options for styling

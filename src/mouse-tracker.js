@@ -1,52 +1,69 @@
 class MouseTracker {
-  constructor() {
+  constructor(options = {}) {
+    this.options = options;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.scrollY = 0;
     this.path = window.location.pathname;
-    this.eventHandlers = {
-      update: []
-    };
-    this.throttleDelay = 50; // ms
+    this.eventHandlers = { update: [], click: [], selection: [] };
+    this.throttleDelay = 50;
     this.lastUpdate = 0;
 
     this.init();
   }
 
   on(event, handler) {
-    if (this.eventHandlers[event]) {
-      this.eventHandlers[event].push(handler);
-    }
+    if (this.eventHandlers[event]) this.eventHandlers[event].push(handler);
   }
 
   emit(event, ...args) {
-    if (this.eventHandlers[event]) {
-      this.eventHandlers[event].forEach(handler => handler(...args));
-    }
+    if (this.eventHandlers[event]) this.eventHandlers[event].forEach(h => h(...args));
   }
 
   init() {
-    // Track mouse movement
     document.addEventListener('mousemove', (e) => {
-      // Use viewport-relative coordinates (percentage)
       this.mouseX = e.clientX / window.innerWidth;
       this.mouseY = e.clientY / window.innerHeight;
       this.throttledUpdate();
     });
 
-    // Track URL changes (for SPAs)
-    this.observeUrlChanges();
+    document.addEventListener('click', (e) => {
+      this.emit('click', {
+        mouseX: e.clientX / window.innerWidth,
+        mouseY: e.clientY / window.innerHeight,
+        timestamp: Date.now()
+      });
+    });
 
-    // Initial update
+    window.addEventListener('scroll', () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      this.scrollY = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      this.throttledUpdate();
+    });
+
+    document.addEventListener('selectionchange', () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+        this.emit('selection', { rects: [], path: this.path, timestamp: Date.now() });
+        return;
+      }
+      const range = selection.getRangeAt(0);
+      const rects = Array.from(range.getClientRects()).map(r => ({
+        x: r.left + window.scrollX,
+        y: r.top + window.scrollY,
+        width: r.width,
+        height: r.height
+      }));
+      this.emit('selection', { rects, path: this.path, timestamp: Date.now() });
+    });
+
+    this.observeUrlChanges();
     this.sendUpdate();
   }
 
   observeUrlChanges() {
-    // Listen for popstate (back/forward navigation)
-    window.addEventListener('popstate', () => {
-      this.handlePathChange();
-    });
+    window.addEventListener('popstate', () => this.handlePathChange());
 
-    // Override pushState and replaceState to detect SPA navigation
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
@@ -78,14 +95,13 @@ class MouseTracker {
   }
 
   sendUpdate() {
-    const data = {
+    this.emit('update', {
       path: this.path,
       mouseX: this.mouseX,
       mouseY: this.mouseY,
+      scrollY: this.scrollY,
       timestamp: Date.now()
-    };
-    console.log('[MouseTracker] Sending:', data);
-    this.emit('update', data);
+    });
   }
 }
 
