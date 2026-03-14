@@ -26,8 +26,8 @@ class ClickAnimator {
   }
 
   showClick(peerId, data) {
-    const x = data.mouseX * window.innerWidth;
-    const y = data.mouseY * window.innerHeight;
+    const x = data.mouseX * document.documentElement.scrollWidth - window.scrollX;
+    const y = data.mouseY * document.documentElement.scrollHeight - window.scrollY;
     const color = data.color || '#FF6B6B';
 
     const ripple = document.createElement('div');

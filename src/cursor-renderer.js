@@ -6,7 +6,7 @@ const DEFAULT_COLORS = [
 class CursorRenderer {
   constructor(options = {}) {
     this.options = options;
-    this.cursors = new Map(); // peerId -> { element, color, currentX, currentY, targetX, targetY, currentPath }
+    this.cursors = new Map(); // peerId -> { element, color, currentPageX, currentPageY, targetPageX, targetPageY, currentPath }
     this.colors = options.colors || DEFAULT_COLORS;
     this.colorIndex = 0;
     this.cursorSize = options.cursorSize || 20;
@@ -96,8 +96,9 @@ class CursorRenderer {
   updateCursor(peerId, data) {
     let cursorData = this.cursors.get(peerId);
 
-    const pixelX = data.mouseX * window.innerWidth;
-    const pixelY = data.mouseY * window.innerHeight;
+    // Convert fractional page coordinates back to absolute page pixels
+    const pageX = data.mouseX * document.documentElement.scrollWidth;
+    const pageY = data.mouseY * document.documentElement.scrollHeight;
 
     if (!cursorData) {
       const color = this.getNextColor();
@@ -105,17 +106,17 @@ class CursorRenderer {
       cursorData = {
         element,
         color,
-        currentX: pixelX,
-        currentY: pixelY,
-        targetX: pixelX,
-        targetY: pixelY,
+        currentPageX: pageX,
+        currentPageY: pageY,
+        targetPageX: pageX,
+        targetPageY: pageY,
         currentPath: data.path
       };
       this.cursors.set(peerId, cursorData);
     }
 
-    cursorData.targetX = pixelX;
-    cursorData.targetY = pixelY;
+    cursorData.targetPageX = pageX;
+    cursorData.targetPageY = pageY;
 
     // Update label text if it changed
     if (this.showLabels && data.label) {
@@ -153,10 +154,15 @@ class CursorRenderer {
   startAnimationLoop() {
     const animate = () => {
       this.cursors.forEach((cursorData) => {
+        // Lerp in page coordinates for smooth mouse movement
         const lerpFactor = 0.2;
-        cursorData.currentX += (cursorData.targetX - cursorData.currentX) * lerpFactor;
-        cursorData.currentY += (cursorData.targetY - cursorData.currentY) * lerpFactor;
-        cursorData.element.style.transform = `translate(${cursorData.currentX}px, ${cursorData.currentY}px)`;
+        cursorData.currentPageX += (cursorData.targetPageX - cursorData.currentPageX) * lerpFactor;
+        cursorData.currentPageY += (cursorData.targetPageY - cursorData.currentPageY) * lerpFactor;
+
+        // Subtract local scroll offset to convert to viewport position (cursor is position: fixed)
+        const viewX = cursorData.currentPageX - window.scrollX;
+        const viewY = cursorData.currentPageY - window.scrollY;
+        cursorData.element.style.transform = `translate(${viewX}px, ${viewY}px)`;
       });
       requestAnimationFrame(animate);
     };

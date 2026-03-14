@@ -22,15 +22,16 @@ class MouseTracker {
 
   init() {
     document.addEventListener('mousemove', (e) => {
-      this.mouseX = e.clientX / window.innerWidth;
-      this.mouseY = e.clientY / window.innerHeight;
+      // Use page-absolute coordinates so scroll position is accounted for
+      this.mouseX = (e.clientX + window.scrollX) / document.documentElement.scrollWidth;
+      this.mouseY = (e.clientY + window.scrollY) / document.documentElement.scrollHeight;
       this.throttledUpdate();
     });
 
     document.addEventListener('click', (e) => {
       this.emit('click', {
-        mouseX: e.clientX / window.innerWidth,
-        mouseY: e.clientY / window.innerHeight,
+        mouseX: (e.clientX + window.scrollX) / document.documentElement.scrollWidth,
+        mouseY: (e.clientY + window.scrollY) / document.documentElement.scrollHeight,
         timestamp: Date.now()
       });
     });
