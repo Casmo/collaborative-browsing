@@ -15,7 +15,15 @@ A lightweight JavaScript library that shows other visitors browsing your website
 
 ## Installation
 
-### Option 1: Direct Script Include
+### Option 1: CDN (jsDelivr)
+
+Include directly from jsDelivr — no download required:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/casmo/collaborative-browsing@master/dist/collaborative-browsing.js"></script>
+```
+
+### Option 2: Direct Script Include
 
 Download `dist/collaborative-browsing.js` and include it in your HTML:
 
@@ -23,7 +31,7 @@ Download `dist/collaborative-browsing.js` and include it in your HTML:
 <script src="path/to/collaborative-browsing.js"></script>
 ```
 
-### Option 2: Build from Source
+### Option 3: Build from Source
 
 ```bash
 npm install
