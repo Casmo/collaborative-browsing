@@ -7,6 +7,15 @@ class PeerManager {
     this.isHost = false;
     this.hostId = options.hostId ? this.sanitizeId(options.hostId) : this.getHostId();
     this.myId = this.generateClientId();
+    this.peerConfig = {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun.fbsbx.com:3478' },
+          { urls: 'stun:stun.cloudflare.com:3478' }
+        ]
+      }
+    };
     this.hostConnectionId = null; // Track which connection is to the host
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 3;
@@ -50,7 +59,7 @@ class PeerManager {
 
   start() {
     // Create peer with our client ID (using PeerJS defaults)
-    this.peer = new Peer(this.myId);
+    this.peer = new Peer(this.myId, this.peerConfig);
 
     this.peer.on('open', () => {
       console.log('[CollaborativeBrowsing] My peer ID:', this.myId);
@@ -114,7 +123,7 @@ class PeerManager {
       this.peer.destroy();
     }
 
-    this.peer = new Peer(this.hostId);
+    this.peer = new Peer(this.hostId, this.peerConfig);
 
     this.peer.on('open', () => {
       console.log('[CollaborativeBrowsing] Successfully became host:', this.hostId);
