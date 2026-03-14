@@ -66,18 +66,32 @@
 
   <h3>Features</h3>
   <ul>
-    <li>See mouse cursors of other visitors in real-time</li>
+    <li>See mouse cursors with name labels of other visitors in real-time</li>
     <li>Each visitor gets a unique color</li>
     <li>Cursors fade out when visitors are on different pages</li>
     <li>Link badges show how many visitors are on each page</li>
+    <li>Click ripple animations on remote clicks</li>
+    <li>Scroll position indicators on the right edge</li>
+    <li>Text selection highlights from other visitors</li>
+    <li>Floating chat panel for real-time messaging</li>
+    <li>Optional sound effects</li>
     <li>Completely peer-to-peer using WebRTC</li>
   </ul>
 
   <h3>How to Add to Your Website</h3>
-  <p>Simply include this single script tag before your closing <code>&lt;/body&gt;</code> tag:</p>
-  <pre>&lt;script src="dist/collaborative-browsing.js"&gt;&lt;/script&gt;</pre>
+  <p>Include the script and call <code>CollaborativeBrowsing.start()</code> with your desired options:</p>
+  <pre>&lt;script src="dist/collaborative-browsing.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CollaborativeBrowsing.start({
+    userLabel: 'Alice',   // optional: set your display name
+    sounds: false         // optional: enable sound effects
+  });
+&lt;/script&gt;</pre>
 
   <!-- Include the collaborative browsing script -->
   <script src="dist/collaborative-browsing.js"></script>
+  <script>
+    CollaborativeBrowsing.start();
+  </script>
 </body>
 </html>
