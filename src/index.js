@@ -48,6 +48,17 @@ class CollaborativeBrowsing {
 
     if (this.options.disabled) return;
 
+    // Defer until DOM is ready so components can safely access document.body
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this._setup());
+      return;
+    }
+
+    this._setup();
+  }
+
+  _setup() {
+
     // Chat auto-generates a label; use that as our label even when chat is off
     this.myLabel = this.options.userLabel || this._randomLabel();
 
